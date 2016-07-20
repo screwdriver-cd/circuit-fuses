@@ -1,7 +1,7 @@
 {
-  "name": "screwdriver-circuit-fuses",
-  "version": "0.0.1",
-  "description": "Module wrapper around node-circuitbreaker to provide a simple callback interface",
+  "name": "circuit-fuses",
+  "version": "1.0.0",
+  "description": "Wrapper around node-circuitbreaker to define a callback interface",
   "main": "index.js",
   "scripts": {
     "pretest": "eslint .",
@@ -15,7 +15,12 @@
   "bugs": "https://github.com/screwdriver-cd/circuit-fuses/issues",
   "keywords": [
     "screwdriver",
-    "yahoo"
+    "yahoo",
+    "circuitbreaker",
+    "circuit-breaker",
+    "circuit",
+    "breaker",
+    "fuses"
   ],
   "license": "BSD-3-Clause",
   "author": "Noah Katzman <nbkatzman@gmail.com>",
@@ -35,7 +40,13 @@
     "eslint-plugin-import": "^1.8.0",
     "eslint-plugin-jsx-a11y": "^1.2.2",
     "eslint-plugin-react": "^5.1.1",
-    "jenkins-mocha": "^2.6.0"
+    "jenkins-mocha": "^2.6.0",
+    "mockery": "^1.7.0",
+    "sinon": "^1.17.4",
+    "sinon-as-promised": "^3.0.1"
   },
-  "dependencies": {}
+  "dependencies": {
+    "circuitbreaker": "^0.2.1",
+    "request": "^2.73.0"
+  }
 }
