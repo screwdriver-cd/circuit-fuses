@@ -39,9 +39,16 @@ breaker.runCommand('http://yahoo.com', (err, resp) => {
 | Parameter        | Type  | Required  |  Description | Default |
 | :-------------   | :---- | :---- | :-------------| :---------- |
 | command        | Function | Yes | The command to run with circuit breaker | none |
-| options.timeout | Number | No | The timeout in ms to wait for a command | 10000 |
-| options.maxFailures | Number | No | The number of failures before the breaker switches |  5  |
-| options.resetTimeout | Number | No | The number in ms to wait before resetting the circuit |  50 |
+| options.breaker | Object | No | The object to configure the breaker module with | {} |
+| options.breaker.timeout | Number | No | The timeout in ms to wait for a command | 10000 |
+| options.breaker.maxFailures | Number | No | The number of failures before the breaker switches |  5  |
+| options.breaker.resetTimeout | Number | No | The number in ms to wait before resetting the circuit |  50 |
+| options.retry | Object | No | The object to configure the retry module with | {} |
+| options.retry.retries | Number | No | The number of retries to do before passing back a failure | 5 |
+| options.retry.factor | Number | No | The exponential factor to use | 2 |
+| options.retry.minTimeout | Number | No | The timeout to wait before doing the first retry | 1000 |
+| options.retry.maxTimeout | Number | No | The max timeout to wait before retrying | Number.MAX_VALUE |
+| options.retry.randomize | Boolean | No | Randomize the timeout | false |
 
 ### Run Command
 To run the command passed to the constructor

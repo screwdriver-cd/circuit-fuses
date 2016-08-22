@@ -31,7 +31,7 @@ describe('index test', () => {
         };
         breakerMock = sinon.stub();
         breakerMock.stats = statsMock;
-        breakerMock.isClosed = sinon.stub();
+        breakerMock.isClosed = sinon.stub().returns(true);
         circuitMock = sinon.stub().returns(breakerMock);
 
         mockery.registerMock('circuitbreaker', circuitMock);
@@ -73,7 +73,11 @@ describe('index test', () => {
 
         it('calls breaker with overridden options', () => {
             const testFn = 'testFn';
-            const testOptions = { timeout: 432 };
+            const testOptions = {
+                breaker: {
+                    timeout: 432
+                }
+            };
             const breaker = new Breaker(testFn, testOptions);
 
             assert.ok(breaker);
@@ -83,13 +87,43 @@ describe('index test', () => {
                 resetTimeout: 50
             });
         });
+
+        it('stores the options', () => {
+            const testFn = 'testFn';
+            const testOptions = {
+                breaker: {
+                    timeout: 432,
+                    maxFailures: 2,
+                    resetTimeout: 10
+                },
+                retry: {
+                    retries: 10,
+                    factor: 4,
+                    minTimeout: 100,
+                    maxTimeout: 10000,
+                    randomize: true
+                }
+            };
+            const breaker = new Breaker(testFn, testOptions);
+
+            assert.ok(breaker);
+            assert.deepEqual(breaker.breakerOptions, testOptions.breaker);
+            assert.deepEqual(breaker.retryOptions, testOptions.retry);
+        });
     });
 
     describe('runCommand', () => {
         let breaker;
 
         beforeEach(() => {
-            breaker = new Breaker('testFn');
+            breaker = new Breaker('testFn', {
+                breaker: {
+                    resetTimeout: 1000
+                },
+                retry: {
+                    minTimeout: 25
+                }
+            });
         });
 
         it('calls breaker with the correct values', (done) => {
@@ -113,13 +147,47 @@ describe('index test', () => {
             });
         });
 
-        it('callsback with error on failure', (done) => {
+        it('returns error but retries when an error and the breaker is closed', (done) => {
             const error = new Error('request failure');
 
             breakerMock.rejects(error);
+
             breaker.runCommand('1', '2', (err, data) => {
                 assert.notOk(data);
                 assert.deepEqual(err, error);
+                assert.callCount(breakerMock, 6);
+                done();
+            });
+        });
+
+        it('does not retry when the breaker is closed', (done) => {
+            const error = new Error('request failure');
+
+            breakerMock.rejects(error);
+            breakerMock.isClosed.onThirdCall().returns(false);
+
+            breaker.runCommand('1', '2', (err, data) => {
+                assert.notOk(data);
+                assert.deepEqual(err, error);
+                assert.callCount(breakerMock, 3);
+                done();
+            });
+        });
+
+        it('retries 3 times until success', (done) => {
+            const error = new Error('request failure');
+
+            breakerMock.rejects(error);
+            breakerMock.onThirdCall().resolves({
+                real: 'data'
+            });
+
+            breaker.runCommand('1', '2', (err, data) => {
+                assert.isNull(err);
+                assert.deepEqual(data, {
+                    real: 'data'
+                });
+                assert.callCount(breakerMock, 3);
                 done();
             });
         });
