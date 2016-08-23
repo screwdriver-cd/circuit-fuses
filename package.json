@@ -1,6 +1,6 @@
 {
   "name": "circuit-fuses",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "Wrapper around node-circuitbreaker to define a callback interface",
   "main": "index.js",
   "scripts": {
@@ -45,6 +45,7 @@
   },
   "dependencies": {
     "circuitbreaker": "^0.2.1",
-    "request": "^2.73.0"
+    "request": "^2.73.0",
+    "retry-function": "^1.1.1"
   }
 }

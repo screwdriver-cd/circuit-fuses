@@ -1,31 +1,48 @@
 'use strict';
+/* eslint-disable no-underscore-dangle */
 const circuitbreaker = require('circuitbreaker');
+const retryFn = require('retry-function');
 
 class CircuitBreaker {
 
     /**
      * Construct a CircuitBreaker object
      * @method constructor
-     * @param  {Function}   command              The command to be running that requires the circuit breaker
-     * @param  {Object}     [options]            Options to configure the circuit breaker with
-     * @param  {Number}     options.timeout      The timeout in ms to wait for a command to complete
-     * @param  {Number}     options.maxFailures  The number of failures before the circuit is tripped
-     * @param  {Number}     options.resetTimeout The timeout in ms to reset the switch
+     * @param  {Function}   command                      The command to be running that requires the circuit breaker
+     * @param  {Object}     [options]                    Options to configure the circuit breaker with
+     * @param  {Number}     options.breaker.timeout      The timeout in ms to wait for a command to complete
+     * @param  {Number}     options.breaker.maxFailures  The number of failures before the circuit is tripped
+     * @param  {Number}     options.breaker.resetTimeout The timeout in ms to reset the switch
+     * @param  {Number}     options.retry.retries        The number of retries to do before passing back a failure
+     * @param  {Number}     options.retry.factor         The exponential factor to use
+     * @param  {Number}     options.retry.minTimeout     The timeout to wait before doing the first retry
+     * @param  {Number}     options.retry.maxTimeout     The max timeout to wait before retrying
+     * @param  {Boolean}    options.retry.randomize      Randomize the timeout
      */
     constructor(command, options) {
         const optionsToCompare = options || {};
+        const breakerOptions = optionsToCompare.breaker || {};
+        const retryOptions = optionsToCompare.retry || {};
 
         this.command = command;
-        this.options = {
-            timeout: optionsToCompare.timeout || 10000,
-            maxFailures: optionsToCompare.maxFailures || 5,
-            resetTimeout: optionsToCompare.resetTimeout || 50
+        this.breakerOptions = {
+            timeout: breakerOptions.timeout || 10000,
+            maxFailures: breakerOptions.maxFailures || 5,
+            resetTimeout: breakerOptions.resetTimeout || 50
         };
-        this.breaker = circuitbreaker(this.command, this.options);
+        this.retryOptions = {
+            retries: retryOptions.retries || 5,
+            factor: retryOptions.factor || 2,
+            minTimeout: retryOptions.minTimeout || 1000,
+            maxTimeout: retryOptions.maxTimeout || Number.MAX_VALUE,
+            randomize: retryOptions.randomize || false
+        };
+
+        this.breaker = circuitbreaker(this.command, this.breakerOptions);
     }
 
     /**
-     * Run the breaker command specified in the constructor
+     * Retry wrapper for the circuit breaker to retry on failure as long as circuit is closed
      * @method runCommand
      * @param  {arguments}   arguments           List of arguments to call the circuit breaker command with
      * @param  {Function}    callback            Last argument is the callback to callback upon completion
@@ -33,13 +50,17 @@ class CircuitBreaker {
     runCommand() {
         const args = Array.prototype.slice.call(arguments);
         const callback = args.pop();
+        const wrapBreaker = (cb) => {
+            this.breaker.apply(this.breaker, args)
+            .then((data) => cb(null, data), (err) => cb(err));
+        };
 
-        this.breaker.apply(this.breaker, args).catch((err) => {
-            callback(err);
-            throw err;
-        }).then((data) => {
-            callback(null, data);
-        });
+        retryFn({
+            method: wrapBreaker,
+            context: this,
+            options: this.retryOptions,
+            shouldRetry: (err) => err && this.isClosed()
+        }, callback);
     }
 
     /**
