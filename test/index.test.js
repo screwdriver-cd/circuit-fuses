@@ -90,7 +90,9 @@ describe('index test', () => {
 
         it('stores the options', () => {
             const testFn = 'testFn';
+            const shouldRetry = () => false;
             const testOptions = {
+                shouldRetry,
                 breaker: {
                     timeout: 432,
                     maxFailures: 2,
@@ -109,6 +111,7 @@ describe('index test', () => {
             assert.ok(breaker);
             assert.deepEqual(breaker.breakerOptions, testOptions.breaker);
             assert.deepEqual(breaker.retryOptions, testOptions.retry);
+            assert.deepEqual(breaker.shouldRetry, shouldRetry);
         });
     });
 
@@ -187,6 +190,32 @@ describe('index test', () => {
                 assert.deepEqual(data, {
                     real: 'data'
                 });
+                assert.callCount(breakerMock, 3);
+                done();
+            });
+        });
+
+        it('will short circuit retries when special conditions met', (done) => {
+            breaker = new Breaker('testFn', {
+                shouldRetry: (err, args) => args[0] === '1' && err.message !== 'request failure2',
+                breaker: {
+                    resetTimeout: 1000,
+                    maxFailures: 400
+                },
+                retry: {
+                    minTimeout: 25
+                }
+            });
+
+            const error = new Error('request failure');
+            const error2 = new Error('request failure2');
+
+            breakerMock.rejects(error);
+            breakerMock.onThirdCall().rejects(error2);
+
+            breaker.runCommand('1', '2', (err, data) => {
+                assert.notOk(data);
+                assert.deepEqual(err, error);
                 assert.callCount(breakerMock, 3);
                 done();
             });

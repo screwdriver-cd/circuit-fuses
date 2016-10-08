@@ -38,6 +38,8 @@ class CircuitBreaker {
             randomize: retryOptions.randomize || false
         };
 
+        this.shouldRetry = (options && options.shouldRetry) || (() => true);
+
         this.breaker = circuitbreaker(this.command, this.breakerOptions);
     }
 
@@ -54,12 +56,13 @@ class CircuitBreaker {
             this.breaker.apply(this.breaker, args)
             .then((data) => cb(null, data), (err) => cb(err));
         };
+        const shouldRetry = this.shouldRetry;
 
         retryFn({
             method: wrapBreaker,
             context: this,
             options: this.retryOptions,
-            shouldRetry: (err) => err && this.isClosed()
+            shouldRetry: (err) => err && this.isClosed() && shouldRetry(err, args)
         }, callback);
     }
 
