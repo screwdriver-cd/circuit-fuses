@@ -49,6 +49,18 @@ breaker.runCommand('http://yahoo.com', (err, resp) => {
 | options.retry.minTimeout | Number | No | The timeout to wait before doing the first retry | 1000 |
 | options.retry.maxTimeout | Number | No | The max timeout to wait before retrying | Number.MAX_VALUE |
 | options.retry.randomize | Boolean | No | Randomize the timeout | false |
+| options.shouldRetry | Function | No | Special logic to should circuit retries | () => true |
+
+### Short circuiting the retry logic
+Normally, the circuit breaker will retry with exponential backoff until the max number of retries has been reached or the breaker has opened due to max failures. You may have operations that you want to immediately fail under certain conditions. In this situation, a shouldRetry option is available. This is a function that receives the err object and arguments passed to the runCommand function.
+
+For example, short circuit when runCommand is called with "MyArg" and the error contains a status code of 404:
+
+```js
+shouldRetry(err, args) {
+    return args[0] === "MyArg" && err.statusCode === 404;
+}
+```
 
 ### Run Command
 To run the command passed to the constructor
