@@ -28,10 +28,29 @@ breaker.runCommand('http://yahoo.com', (err, resp) => {
     }
     // Here there is no error and it's possible to proceed with the resp object
 });
-
 ```
 
-**Note** The function signature of the callback passed to command is `callback(err, data)`. Extra parameters passed to the callback are ignored.
+The `runCommand` method will return a promise if a callback is not supplied.
+
+```js
+const Breaker = require('circuit-fuses');
+const request = require('request');
+const command = request.get
+// To setup the fuse, instantiate a new Breaker with the command to run
+const breaker = new Breaker(command);
+
+breaker.runCommand('http://yahoo.com')
+    .then(resp => {
+        // Here there is no error and it's possible to proceed with the resp object
+    })
+    .catch(err => {
+        /* If the circuit is open the command is not run, and an error
+         * with message "CircuitBreaker Open" is returned.
+         * In this case, you can switch on the error and have a fallback technique
+         */
+        // ... stuff
+    });
+```
 
 ### Constructor
 `constructor(command, options)` 
@@ -52,7 +71,7 @@ breaker.runCommand('http://yahoo.com', (err, resp) => {
 | options.shouldRetry | Function | No | Special logic to should circuit retries | () => true |
 
 ### Short circuiting the retry logic
-Normally, the circuit breaker will retry with exponential backoff until the max number of retries has been reached or the breaker has opened due to max failures. You may have operations that you want to immediately fail under certain conditions. In this situation, a shouldRetry option is available. This is a function that receives the err object and arguments passed to the runCommand function.
+Normally, the circuit breaker will retry with exponential back off until the max number of retries has been reached or the breaker has opened due to max failures. You may have operations that you want to immediately fail under certain conditions. In this situation, a shouldRetry option is available. This is a function that receives the err object and arguments passed to the runCommand function.
 
 For example, short circuit when runCommand is called with "MyArg" and the error contains a status code of 404:
 
@@ -70,7 +89,7 @@ To run the command passed to the constructor
 | Parameter        | Type  | Required  |  Description |
 | :-------------   | :---- | :---- | :-------------|
 | args        | Arguments | No | The arguments to pass to the command |
-| callback | Function | Yes | The callback to call when the command returns |
+| callback | Function | No | The callback to call when the command returns |
 
 ### Get Total Number Requests
 Returns the total number of requests from the circuit breaker
@@ -106,6 +125,9 @@ Returns the average request time taken
 Returns boolean whether the circuit breaker is closed
 
 `isClosed()`
+
+### Get a holistic set of the above metrics
+`stats()`
 
 ## Testing
 

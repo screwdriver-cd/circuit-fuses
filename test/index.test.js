@@ -1,4 +1,5 @@
 'use strict';
+
 const assert = require('chai').assert;
 const sinon = require('sinon');
 const mockery = require('mockery');
@@ -220,6 +221,28 @@ describe('index test', () => {
                 done();
             });
         });
+
+        it('implements a promise interface when no callback', () => {
+            breakerMock.resolves('foo');
+
+            return breaker.runCommand('1', '2')
+                .then((data) => {
+                    assert.calledWith(breakerMock, '1', '2');
+                    assert.equal(data, 'foo');
+                });
+        });
+
+        it('handles broken promise when no callback', () => {
+            const breakerError = new Error('nope');
+
+            breakerMock.rejects(breakerError);
+
+            return breaker.runCommand('1', '2')
+                .catch((err) => {
+                    assert.calledWith(breakerMock, '1', '2');
+                    assert.deepEqual(err, breakerError);
+                });
+        });
     });
 
     describe('getTotalRequests', () => {
@@ -278,6 +301,30 @@ describe('index test', () => {
             const breaker = new Breaker();
 
             assert.equal(breaker.isClosed(), false);
+        });
+    });
+
+    describe('stats', () => {
+        it('should provide a unified stats interface', () => {
+            breakerMock.isClosed.returns(false);
+            statsMock.averageResponseTime.returns(6);
+            statsMock.concurrentRequests.returns(5);
+
+            const breaker = new Breaker();
+
+            assert.deepEqual(breaker.stats(), {
+                requests: {
+                    total: 1,
+                    timeouts: 2,
+                    success: 3,
+                    failure: 4,
+                    concurrent: 5,
+                    averageTime: 6
+                },
+                breaker: {
+                    isClosed: false
+                }
+            });
         });
     });
 });
