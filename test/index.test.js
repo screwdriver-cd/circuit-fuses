@@ -303,4 +303,28 @@ describe('index test', () => {
             assert.equal(breaker.isClosed(), false);
         });
     });
+
+    describe('stats', () => {
+        it('should provide a unified stats interface', () => {
+            breakerMock.isClosed.returns(false);
+            statsMock.averageResponseTime.returns(6);
+            statsMock.concurrentRequests.returns(5);
+
+            const breaker = new Breaker();
+
+            assert.deepEqual(breaker.stats(), {
+                requests: {
+                    total: 1,
+                    timeouts: 2,
+                    success: 3,
+                    failure: 4,
+                    concurrent: 5,
+                    averageTime: 6
+                },
+                breaker: {
+                    isClosed: false
+                }
+            });
+        });
+    });
 });

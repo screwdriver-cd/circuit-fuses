@@ -54,7 +54,7 @@ class CircuitBreaker {
         const args = Array.prototype.slice.call(arguments);
         let callback;
 
-        if (typeof args[args.length - 1] === 'function') {
+        if (args.length >= 1 && typeof args[args.length - 1] === 'function') {
             callback = args.pop();
         }
 
@@ -145,6 +145,27 @@ class CircuitBreaker {
      */
     getAverageRequestTime() {
         return this.breaker.stats.averageResponseTime();
+    }
+
+    /**
+    * Retrieve stats for the breaker
+    * @method   stats
+    * @returns  {Object}           Object containing stats for the breaker
+    */
+    stats() {
+        return {
+            requests: {
+                total: this.breaker.stats.totalRequests,
+                timeouts: this.breaker.stats.timeouts,
+                success: this.breaker.stats.successfulResponses,
+                failure: this.breaker.stats.failedResponses,
+                concurrent: this.breaker.stats.concurrentRequests(),
+                averageTime: this.breaker.stats.averageResponseTime()
+            },
+            breaker: {
+                isClosed: this.breaker.isClosed()
+            }
+        };
     }
 }
 
