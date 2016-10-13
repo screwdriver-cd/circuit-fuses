@@ -1,4 +1,5 @@
 'use strict';
+
 const assert = require('chai').assert;
 const sinon = require('sinon');
 const mockery = require('mockery');
@@ -219,6 +220,28 @@ describe('index test', () => {
                 assert.callCount(breakerMock, 3);
                 done();
             });
+        });
+
+        it('implements a promise interface when no callback', () => {
+            breakerMock.resolves('foo');
+
+            return breaker.runCommand('1', '2')
+                .then((data) => {
+                    assert.calledWith(breakerMock, '1', '2');
+                    assert.equal(data, 'foo');
+                });
+        });
+
+        it('handles broken promise when no callback', () => {
+            const breakerError = new Error('nope');
+
+            breakerMock.rejects(breakerError);
+
+            return breaker.runCommand('1', '2')
+                .catch((err) => {
+                    assert.calledWith(breakerMock, '1', '2');
+                    assert.deepEqual(err, breakerError);
+                });
         });
     });
 

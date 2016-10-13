@@ -1,4 +1,5 @@
 'use strict';
+
 /* eslint-disable no-underscore-dangle */
 const circuitbreaker = require('circuitbreaker');
 const retryFn = require('retry-function');
@@ -47,23 +48,40 @@ class CircuitBreaker {
      * Retry wrapper for the circuit breaker to retry on failure as long as circuit is closed
      * @method runCommand
      * @param  {arguments}   arguments           List of arguments to call the circuit breaker command with
-     * @param  {Function}    callback            Last argument is the callback to callback upon completion
+     * @param  {Function}    [callback]          Last argument is the callback to callback upon completion
      */
     runCommand() {
         const args = Array.prototype.slice.call(arguments);
-        const callback = args.pop();
+        let callback;
+
+        if (typeof args[args.length - 1] === 'function') {
+            callback = args.pop();
+        }
+
         const wrapBreaker = (cb) => {
             this.breaker.apply(this.breaker, args)
-            .then((data) => cb(null, data), (err) => cb(err));
+            .then(data => cb(null, data), err => cb(err));
         };
         const shouldRetry = this.shouldRetry;
 
-        retryFn({
-            method: wrapBreaker,
-            context: this,
-            options: this.retryOptions,
-            shouldRetry: (err) => err && this.isClosed() && shouldRetry(err, args)
-        }, callback);
+        return new Promise((resolve, reject) => {
+            retryFn({
+                method: wrapBreaker,
+                context: this,
+                options: this.retryOptions,
+                shouldRetry: err => err && this.isClosed() && shouldRetry(err, args)
+            }, (err, ...data) => {
+                if (typeof callback === 'function') {
+                    return callback(err, ...data);
+                }
+
+                if (err) {
+                    return reject(err);
+                }
+
+                return resolve(...data);
+            });
+        });
     }
 
     /**
