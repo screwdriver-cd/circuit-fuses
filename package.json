@@ -46,6 +46,6 @@
   "dependencies": {
     "circuitbreaker": "^0.2.1",
     "request": "^2.73.0",
-    "retry-function": "^1.1.1"
+    "retry-function": "^2.0.0"
   }
 }
