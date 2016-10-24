@@ -145,8 +145,8 @@ Code licensed under the BSD 3-Clause license. See LICENSE file for terms.
 [license-image]: https://img.shields.io/npm/l/circuit-fuses.svg
 [issues-image]: https://img.shields.io/github/issues/screwdriver-cd/circuit-fuses.svg
 [issues-url]: https://github.com/screwdriver-cd/circuit-fuses/issues
-[status-image]: https://cd.screwdriver.cd/pipelines/4b5d5fac50d116c39b24347a9617475f225a9546/badge
-[status-url]: https://cd.screwdriver.cd/pipelines/4b5d5fac50d116c39b24347a9617475f225a9546
+[status-image]: https://cd.screwdriver.cd/pipelines/515489f7c08c3c32e688ea4430240fa7eb95dbe0/badge
+[status-url]: https://cd.screwdriver.cd/pipelines/515489f7c08c3c32e688ea4430240fa7eb95dbe0
 [daviddm-image]: https://david-dm.org/screwdriver-cd/circuit-fuses.svg?theme=shields.io
 [daviddm-url]: https://david-dm.org/screwdriver-cd/circuit-fuses
 [node-circuitbreaker]: https://github.com/ryanfitz/node-circuitbreaker
