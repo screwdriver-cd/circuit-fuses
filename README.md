@@ -143,10 +143,10 @@ Code licensed under the BSD 3-Clause license. See LICENSE file for terms.
 [npm-url]: https://npmjs.org/package/circuit-fuses
 [downloads-image]: https://img.shields.io/npm/dt/circuit-fuses.svg
 [license-image]: https://img.shields.io/npm/l/circuit-fuses.svg
-[issues-image]: https://img.shields.io/github/issues/screwdriver-cd/circuit-fuses.svg
-[issues-url]: https://github.com/screwdriver-cd/circuit-fuses/issues
-[status-image]: https://cd.screwdriver.cd/pipelines/515489f7c08c3c32e688ea4430240fa7eb95dbe0/badge
-[status-url]: https://cd.screwdriver.cd/pipelines/515489f7c08c3c32e688ea4430240fa7eb95dbe0
+[issues-image]: https://img.shields.io/github/issues/screwdriver-cd/screwdriver.svg
+[issues-url]: https://github.com/screwdriver-cd/screwdriver/issues
+[status-image]: https://cd.screwdriver.cd/pipelines/22/badge
+[status-url]: https://cd.screwdriver.cd/pipelines/22
 [daviddm-image]: https://david-dm.org/screwdriver-cd/circuit-fuses.svg?theme=shields.io
 [daviddm-url]: https://david-dm.org/screwdriver-cd/circuit-fuses
 [node-circuitbreaker]: https://github.com/ryanfitz/node-circuitbreaker
