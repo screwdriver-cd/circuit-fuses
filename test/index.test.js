@@ -10,6 +10,7 @@ sinon.assert.expose(assert, { prefix: '' });
 
 describe('index test', () => {
     let Breaker;
+    let FuseBox;
     let circuitMock;
     let breakerMock;
     let statsMock;
@@ -33,12 +34,14 @@ describe('index test', () => {
         breakerMock = sinon.stub();
         breakerMock.stats = statsMock;
         breakerMock.isClosed = sinon.stub().returns(true);
+        breakerMock.on = sinon.stub();
         circuitMock = sinon.stub().returns(breakerMock);
 
         mockery.registerMock('circuitbreaker', circuitMock);
 
         /* eslint-disable global-require */
-        Breaker = require('../index');
+        Breaker = require('../index').breaker;
+        FuseBox = require('../index').box;
          /* eslint-enable global-require */
     });
 
@@ -325,6 +328,40 @@ describe('index test', () => {
                     isClosed: false
                 }
             });
+        });
+    });
+
+    describe('fuse box', () => {
+        beforeEach(() => {
+            mockery.disable();
+            /* eslint-disable global-require */
+            Breaker = require('../index').breaker;
+            FuseBox = require('../index').box;
+            /* eslint-enable global-require */
+        });
+
+        it('should trip all fuses when one opens', () => {
+            const breaker1 = new Breaker('testFn');
+            const breaker2 = new Breaker('testFn2');
+            const breaker3 = new Breaker('testFn3');
+            const breaker4 = new Breaker('testFn4');
+            const fusebox = new FuseBox();
+
+            fusebox.addFuse(breaker1);
+            fusebox.addFuse(breaker2);
+            fusebox.addFuse(breaker3);
+
+            assert.isTrue(breaker1.isClosed());
+            assert.isTrue(breaker2.isClosed());
+            assert.isTrue(breaker3.isClosed());
+            assert.isTrue(breaker4.isClosed());
+
+            breaker1.forceOpen();
+
+            assert.isFalse(breaker1.isClosed());
+            assert.isFalse(breaker2.isClosed());
+            assert.isFalse(breaker3.isClosed());
+            assert.isTrue(breaker4.isClosed());
         });
     });
 });

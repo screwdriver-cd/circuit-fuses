@@ -12,7 +12,7 @@ npm install circuit-fuses
 This module wraps the [node-circuitbreaker] and provides a simple callback interface for handling the circuit breaker.
 
 ```js
-const Breaker = require('circuit-fuses');
+const Breaker = require('circuit-fuses').breaker;
 const request = require('request');
 const command = request.get
 // To setup the fuse, instantiate a new Breaker with the command to run
@@ -33,7 +33,7 @@ breaker.runCommand('http://yahoo.com', (err, resp) => {
 The `runCommand` method will return a promise if a callback is not supplied.
 
 ```js
-const Breaker = require('circuit-fuses');
+const Breaker = require('circuit-fuses').breaker;
 const request = require('request');
 const command = request.get
 // To setup the fuse, instantiate a new Breaker with the command to run
@@ -128,6 +128,34 @@ Returns boolean whether the circuit breaker is closed
 
 ### Get a holistic set of the above metrics
 `stats()`
+
+## Using Fuseboxes
+
+A FuseBox is a collection of circuit breakers. If one circuit breaker in the fuse box breaks, the others break as well. To create a new fusebox:
+
+```
+const FuseBox = require('circuit-fuses').box;
+const fusebox = new FuseBox();
+```
+
+To add circuit breakers to the fuse box, use the `addFuse()` method.
+
+`addFuse(circuitbreaker)`
+
+| Parameter        | Type  | Required  |  Description |
+| :-------------   | :---- | :---- | :-------------|
+| circuitbreaker   | CircuitBreaker | Yes | The circuit breaker to add to the fuse box |
+
+Here's an example:
+
+```
+var breaker1 = new Breaker('testFn');
+var breaker2 = new Breaker('testFn2');
+var breaker3 = new Breaker('testFn3');
+fusebox.addFuse(breaker1);
+fusebox.addFuse(breaker2);
+```
+In the above case, if breaker1 trips, breaker2 will trip as well because both of them belong to the same fuse box.
 
 ## Testing
 

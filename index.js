@@ -3,8 +3,12 @@
 /* eslint-disable no-underscore-dangle */
 const circuitbreaker = require('circuitbreaker');
 const retryFn = require('retry-function');
+const EventEmitter = require('events');
 
-class CircuitBreaker {
+/* Class representing a node circuit breaker.
+ * @extends EventEmitter
+ */
+class CircuitBreaker extends EventEmitter {
 
     /**
      * Construct a CircuitBreaker object
@@ -21,6 +25,9 @@ class CircuitBreaker {
      * @param  {Boolean}    options.retry.randomize      Randomize the timeout
      */
     constructor(command, options) {
+        super();
+
+        const self = this;
         const optionsToCompare = options || {};
         const breakerOptions = optionsToCompare.breaker || {};
         const retryOptions = optionsToCompare.retry || {};
@@ -42,6 +49,7 @@ class CircuitBreaker {
         this.shouldRetry = (options && options.shouldRetry) || (() => true);
 
         this.breaker = circuitbreaker(this.command, this.breakerOptions);
+        this.breaker.on('open', () => self.emit('open'));
     }
 
     /**
@@ -148,6 +156,14 @@ class CircuitBreaker {
     }
 
     /**
+     * Force the circuit breaker open
+     * @method forceOpen
+     */
+    forceOpen() {
+        this.breaker.forceOpen();
+    }
+
+    /**
     * Retrieve stats for the breaker
     * @method   stats
     * @returns  {Object}           Object containing stats for the breaker
@@ -169,4 +185,38 @@ class CircuitBreaker {
     }
 }
 
-module.exports = CircuitBreaker;
+/* Class representing a collection of CircuitBreaker instances */
+class FuseBox {
+    /**
+     * Construct a FuseBox object
+     * @constructor
+     */
+    constructor() {
+        this.fuses = [];
+    }
+
+    /**
+     * Add an existing circuit breaker to the fuse box
+     * @method   addFuse
+     * @param  {CircuitBreaker}   breaker                The circuit breaker to be added to the fuse box
+     */
+    addFuse(breaker) {
+        const self = this;
+
+        breaker.on('open', () => self.tripFuses());
+        this.fuses.push(breaker);
+    }
+
+    /**
+     * Trip all the circuit breakers inside the fuse box.
+     * @method   tripFuses
+     */
+    tripFuses() {
+        this.fuses.map(fuse => fuse.forceOpen());
+    }
+}
+
+module.exports = {
+    breaker: CircuitBreaker,
+    box: FuseBox
+};
