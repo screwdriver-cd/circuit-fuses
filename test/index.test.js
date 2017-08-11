@@ -341,7 +341,7 @@ describe('index test', () => {
         });
 
         it('should trip all fuses when one opens', () => {
-            const breaker1 = new Breaker('testFn');
+            const breaker1 = new Breaker(() => console.log('foo'));
             const breaker2 = new Breaker('testFn2');
             const breaker3 = new Breaker('testFn3');
             const breaker4 = new Breaker('testFn4');

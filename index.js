@@ -27,7 +27,6 @@ class CircuitBreaker extends EventEmitter {
     constructor(command, options) {
         super();
 
-        const self = this;
         const optionsToCompare = options || {};
         const breakerOptions = optionsToCompare.breaker || {};
         const retryOptions = optionsToCompare.retry || {};
@@ -49,7 +48,11 @@ class CircuitBreaker extends EventEmitter {
         this.shouldRetry = (options && options.shouldRetry) || (() => true);
 
         this.breaker = circuitbreaker(this.command, this.breakerOptions);
-        this.breaker.on('open', () => self.emit('open'));
+        this.breaker.on('open', () => {
+            console.error(`Breaker with function ${this.command.toString()} \
+was tripped on ${new Date().toUTCString()}`);
+            this.emit('open');
+        });
     }
 
     /**
