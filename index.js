@@ -163,7 +163,10 @@ was tripped on ${new Date().toUTCString()}`);
      * @method forceOpen
      */
     forceOpen() {
-        this.breaker.forceOpen();
+        if (this.breaker.isClosed()) {
+            console.log(`Forcing open ${this.command.toString()}`);
+            this.breaker.forceOpen();
+        }
     }
 
     /**

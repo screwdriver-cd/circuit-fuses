@@ -363,5 +363,18 @@ describe('index test', () => {
             assert.isFalse(breaker3.isClosed());
             assert.isTrue(breaker4.isClosed());
         });
+
+        it('should not try to forceOpen when already open', () => {
+            const breaker1 = new Breaker('testFn');
+
+            sinon.spy(breaker1.breaker, 'forceOpen');
+            breakerMock.isClosed = sinon.stub().returns(true);
+            breaker1.forceOpen();
+
+            breakerMock.isClosed = sinon.stub().returns(false);
+            breaker1.forceOpen();
+
+            assert(breaker1.breaker.forceOpen.calledOnce);
+        });
     });
 });
