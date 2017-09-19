@@ -1,7 +1,7 @@
 'use strict';
 
 /* eslint-disable no-underscore-dangle */
-const circuitbreaker = require('circuitbreaker');
+const circuitbreaker = require('screwdriver-node-circuitbreaker');
 const retryFn = require('retry-function');
 const EventEmitter = require('events');
 
@@ -35,7 +35,8 @@ class CircuitBreaker extends EventEmitter {
         this.breakerOptions = {
             timeout: breakerOptions.timeout || 10000,
             maxFailures: breakerOptions.maxFailures || 5,
-            resetTimeout: breakerOptions.resetTimeout || 50
+            resetTimeout: breakerOptions.resetTimeout || 50,
+            errorFn: breakerOptions.errorFn || (() => true)
         };
         this.retryOptions = {
             retries: retryOptions.retries || 5,

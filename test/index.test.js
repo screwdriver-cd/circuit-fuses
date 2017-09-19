@@ -37,7 +37,7 @@ describe('index test', () => {
         breakerMock.on = sinon.stub();
         circuitMock = sinon.stub().returns(breakerMock);
 
-        mockery.registerMock('circuitbreaker', circuitMock);
+        mockery.registerMock('screwdriver-node-circuitbreaker', circuitMock);
 
         /* eslint-disable global-require */
         Breaker = require('../index').breaker;
@@ -85,11 +85,12 @@ describe('index test', () => {
             const breaker = new Breaker(testFn, testOptions);
 
             assert.ok(breaker);
-            assert.calledWith(circuitMock, testFn, {
+            assert.calledWith(circuitMock, testFn, sinon.match({
                 timeout: 432,
                 maxFailures: 5,
-                resetTimeout: 50
-            });
+                resetTimeout: 50,
+                errorFn: sinon.match(() => true, 'errorFn')
+            }));
         });
 
         it('stores the options', () => {
@@ -100,7 +101,8 @@ describe('index test', () => {
                 breaker: {
                     timeout: 432,
                     maxFailures: 2,
-                    resetTimeout: 10
+                    resetTimeout: 10,
+                    errorFn: () => true
                 },
                 retry: {
                     retries: 10,
