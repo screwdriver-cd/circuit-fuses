@@ -9,7 +9,7 @@
 npm install circuit-fuses
 ```
 
-This module wraps the [node-circuitbreaker] and provides a simple callback interface for handling the circuit breaker.
+This module wraps the [node-circuitbreaker] and provides a callback interface for handling the circuit breaker.
 
 ```js
 const Breaker = require('circuit-fuses').breaker;
