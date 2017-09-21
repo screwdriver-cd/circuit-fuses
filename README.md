@@ -1,7 +1,7 @@
 # Circuit-fuses
 [![Version][npm-image]][npm-url] ![Downloads][downloads-image] [![Build Status][status-image]][status-url] [![Open Issues][issues-image]][issues-url] [![Dependency Status][daviddm-image]][daviddm-url] ![License][license-image]
 
-> Wrapper around node-circuitbreaker to define a callback interface
+> Wrapper around screwdriver-node-circuitbreaker to define a callback interface
 
 ## Usage
 
@@ -9,7 +9,7 @@
 npm install circuit-fuses
 ```
 
-This module wraps the [node-circuitbreaker] and provides a callback interface for handling the circuit breaker.
+This module wraps the [screwdriver-node-circuitbreaker] and provides a simple callback interface for handling the circuit breaker.
 
 ```js
 const Breaker = require('circuit-fuses').breaker;
@@ -177,4 +177,4 @@ Code licensed under the BSD 3-Clause license. See LICENSE file for terms.
 [status-url]: https://cd.screwdriver.cd/pipelines/22
 [daviddm-image]: https://david-dm.org/screwdriver-cd/circuit-fuses.svg?theme=shields.io
 [daviddm-url]: https://david-dm.org/screwdriver-cd/circuit-fuses
-[node-circuitbreaker]: https://github.com/ryanfitz/node-circuitbreaker
+[screwdriver-node-circuitbreaker]: https://github.com/screwdriver-cd/node-circuitbreaker
