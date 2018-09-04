@@ -88,7 +88,7 @@ was tripped on ${new Date().toUTCString()}`);
                 }
 
                 if (err) {
-                    console.log(`Getting errors with ${args}: ${err}`);
+                    console.log(`Getting errors with ${JSON.stringify(args)}: ${err}`);
 
                     return reject(err);
                 }
