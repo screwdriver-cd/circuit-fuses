@@ -88,6 +88,7 @@ was tripped on ${new Date().toUTCString()}`);
                 }
 
                 if (err) {
+                    console.log(`Getting errors with ${args}: ${err}`);
                     return reject(err);
                 }
 
