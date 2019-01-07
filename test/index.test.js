@@ -42,7 +42,7 @@ describe('index test', () => {
         /* eslint-disable global-require */
         Breaker = require('../index').breaker;
         FuseBox = require('../index').box;
-         /* eslint-enable global-require */
+        /* eslint-enable global-require */
     });
 
     afterEach(() => {
@@ -343,6 +343,7 @@ describe('index test', () => {
         });
 
         it('should trip all fuses when one opens', () => {
+            // eslint-disable-next-line no-console
             const breaker1 = new Breaker(() => console.log('foo'));
             const breaker2 = new Breaker('testFn2');
             const breaker3 = new Breaker('testFn3');

@@ -9,7 +9,6 @@ const EventEmitter = require('events');
  * @extends EventEmitter
  */
 class CircuitBreaker extends EventEmitter {
-
     /**
      * Construct a CircuitBreaker object
      * @method constructor
@@ -50,6 +49,7 @@ class CircuitBreaker extends EventEmitter {
 
         this.breaker = circuitbreaker(this.command, this.breakerOptions);
         this.breaker.on('open', () => {
+            // eslint-disable-next-line no-console
             console.error(`Breaker with function ${this.command.toString()} \
 was tripped on ${new Date().toUTCString()}`);
             this.emit('open');
@@ -72,7 +72,7 @@ was tripped on ${new Date().toUTCString()}`);
 
         const wrapBreaker = (cb) => {
             this.breaker.apply(this.breaker, args)
-            .then(data => cb(null, data), err => cb(err));
+                .then(data => cb(null, data), err => cb(err));
         };
         const shouldRetry = this.shouldRetry;
 
@@ -88,6 +88,7 @@ was tripped on ${new Date().toUTCString()}`);
                 }
 
                 if (err) {
+                    // eslint-disable-next-line no-console
                     console.log(`Getting errors with ${JSON.stringify(args)}: ${err}`);
 
                     return reject(err);
@@ -167,6 +168,7 @@ was tripped on ${new Date().toUTCString()}`);
      */
     forceOpen() {
         if (this.breaker.isClosed()) {
+            // eslint-disable-next-line no-console
             console.log(`Forcing open ${this.command.toString()}`);
             this.breaker.forceOpen();
         }
