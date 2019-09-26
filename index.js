@@ -32,7 +32,7 @@ class CircuitBreaker extends EventEmitter {
 
         this.command = command;
         this.breakerOptions = {
-            timeout: breakerOptions.timeout || 10000,
+            timeout: breakerOptions.timeout || 15000,
             maxFailures: breakerOptions.maxFailures || 5,
             resetTimeout: breakerOptions.resetTimeout || 50,
             errorFn: breakerOptions.errorFn || (() => true)
