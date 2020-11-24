@@ -1,5 +1,5 @@
 # Circuit-fuses
-[![Version][npm-image]][npm-url] ![Downloads][downloads-image] [![Build Status][status-image]][status-url] [![Open Issues][issues-image]][issues-url] [![Dependency Status][daviddm-image]][daviddm-url] ![License][license-image]
+[![Version][npm-image]][npm-url] ![Downloads][downloads-image] [![Build Status][status-image]][status-url] [![Open Issues][issues-image]][issues-url] ![License][license-image]
 
 > Wrapper around [screwdriver-node-circuitbreaker] to define a callback interface
 
@@ -175,6 +175,4 @@ Code licensed under the BSD 3-Clause license. See LICENSE file for terms.
 [issues-url]: https://github.com/screwdriver-cd/screwdriver/issues
 [status-image]: https://cd.screwdriver.cd/pipelines/22/badge
 [status-url]: https://cd.screwdriver.cd/pipelines/22
-[daviddm-image]: https://david-dm.org/screwdriver-cd/circuit-fuses.svg?theme=shields.io
-[daviddm-url]: https://david-dm.org/screwdriver-cd/circuit-fuses
 [screwdriver-node-circuitbreaker]: https://github.com/screwdriver-cd/node-circuitbreaker
