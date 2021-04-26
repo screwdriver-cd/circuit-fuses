@@ -248,6 +248,18 @@ describe('index test', () => {
                     assert.deepEqual(err, breakerError);
                 });
         });
+        it('Return error when the CircuitBreaker timeout', () => {
+            const breakerError = new Error('CircuitBreaker timeout');
+
+            breakerMock.rejects(breakerError);
+
+            return breaker.runCommand('1', '2')
+                .catch((err) => {
+                    assert.calledWith(breakerMock, '1', '2');
+                    assert.deepEqual(err, breakerError);
+                    assert.deepEqual(err.status, 504);
+                });
+        });
     });
 
     describe('getTotalRequests', () => {
