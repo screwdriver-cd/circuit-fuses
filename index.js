@@ -91,7 +91,9 @@ was tripped on ${new Date().toUTCString()}`);
                     // eslint-disable-next-line no-console
                     console.log(`Getting errors with ${JSON.stringify(args)}: ${err}`);
                     if (err.message.indexOf('CircuitBreaker timeout') !== -1) {
-                        err.status = 504;
+                        if (err.status === undefined) {
+                            err.status = 504;
+                        }
                     }
 
                     return reject(err);
