@@ -1,7 +1,9 @@
+/* eslint-disable max-classes-per-file */
+
 'use strict';
 
-/* eslint-disable no-underscore-dangle */
 const circuitbreaker = require('screwdriver-node-circuitbreaker');
+const logger = require('screwdriver-logger');
 const retryFn = require('retry-function');
 const EventEmitter = require('events');
 
@@ -49,8 +51,7 @@ class CircuitBreaker extends EventEmitter {
 
         this.breaker = circuitbreaker(this.command, this.breakerOptions);
         this.breaker.on('open', () => {
-            // eslint-disable-next-line no-console
-            console.error(`Breaker with function ${this.command.toString()} \
+            logger.error(`Breaker with function ${this.command.toString()} \
 was tripped on ${new Date().toUTCString()}`);
             this.emit('open');
         });
@@ -70,37 +71,41 @@ was tripped on ${new Date().toUTCString()}`);
             callback = args.pop();
         }
 
-        const wrapBreaker = (cb) => {
-            this.breaker.apply(this.breaker, args)
-                .then(data => cb(null, data), err => cb(err));
+        const wrapBreaker = cb => {
+            this.breaker.apply(this.breaker, args).then(
+                data => cb(null, data),
+                err => cb(err)
+            );
         };
-        const shouldRetry = this.shouldRetry;
+        const { shouldRetry } = this;
 
         return new Promise((resolve, reject) => {
-            retryFn({
-                method: wrapBreaker,
-                context: this,
-                options: this.retryOptions,
-                shouldRetry: err => err && this.isClosed() && shouldRetry(err, args)
-            }, (err, ...data) => {
-                if (typeof callback === 'function') {
-                    return callback(err, ...data);
-                }
-
-                if (err) {
-                    // eslint-disable-next-line no-console
-                    console.log(`Getting errors with ${JSON.stringify(args)}: ${err}`);
-                    if (err.status === undefined) {
-                        if (err.message.indexOf('CircuitBreaker timeout') !== -1) {
-                            err.status = 504;
-                        }
+            retryFn(
+                {
+                    method: wrapBreaker,
+                    context: this,
+                    options: this.retryOptions,
+                    shouldRetry: err => err && this.isClosed() && shouldRetry(err, args)
+                },
+                (err, ...data) => {
+                    if (typeof callback === 'function') {
+                        return callback(err, ...data);
                     }
 
-                    return reject(err);
-                }
+                    if (err) {
+                        logger.info(`Getting errors with ${JSON.stringify(args)}: ${err}`);
+                        if (err.status === undefined) {
+                            if (err.message.indexOf('CircuitBreaker timeout') !== -1) {
+                                err.status = 504;
+                            }
+                        }
 
-                return resolve(...data);
-            });
+                        return reject(err);
+                    }
+
+                    return resolve(...data);
+                }
+            );
         });
     }
 
@@ -173,17 +178,16 @@ was tripped on ${new Date().toUTCString()}`);
      */
     forceOpen() {
         if (this.breaker.isClosed()) {
-            // eslint-disable-next-line no-console
-            console.log(`Forcing open ${this.command.toString()}`);
+            logger.info(`Forcing open ${this.command.toString()}`);
             this.breaker.forceOpen();
         }
     }
 
     /**
-    * Retrieve stats for the breaker
-    * @method   stats
-    * @returns  {Object}           Object containing stats for the breaker
-    */
+     * Retrieve stats for the breaker
+     * @method   stats
+     * @returns  {Object}           Object containing stats for the breaker
+     */
     stats() {
         return {
             requests: {
