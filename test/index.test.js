@@ -1,10 +1,8 @@
 'use strict';
 
-const assert = require('chai').assert;
+const { assert } = require('chai');
 const sinon = require('sinon');
 const mockery = require('mockery');
-
-require('sinon-as-promised');
 
 sinon.assert.expose(assert, { prefix: '' });
 
@@ -85,12 +83,16 @@ describe('index test', () => {
             const breaker = new Breaker(testFn, testOptions);
 
             assert.ok(breaker);
-            assert.calledWith(circuitMock, testFn, sinon.match({
-                timeout: 432,
-                maxFailures: 5,
-                resetTimeout: 50,
-                errorFn: sinon.match(() => true, 'errorFn')
-            }));
+            assert.calledWith(
+                circuitMock,
+                testFn,
+                sinon.match({
+                    timeout: 432,
+                    maxFailures: 5,
+                    resetTimeout: 50,
+                    errorFn: sinon.match(() => true, 'errorFn')
+                })
+            );
         });
 
         it('stores the options', () => {
@@ -135,7 +137,7 @@ describe('index test', () => {
             });
         });
 
-        it('calls breaker with the correct values', (done) => {
+        it('calls breaker with the correct values', done => {
             breakerMock.resolves();
             breaker.runCommand('1', '2', () => {
                 assert.calledWith(breakerMock, '1', '2');
@@ -143,7 +145,7 @@ describe('index test', () => {
             });
         });
 
-        it('callsback with correct data on success', (done) => {
+        it('callsback with correct data on success', done => {
             breakerMock.resolves({
                 real: 'data'
             });
@@ -156,7 +158,7 @@ describe('index test', () => {
             });
         });
 
-        it('returns error but retries when an error and the breaker is closed', (done) => {
+        it('returns error but retries when an error and the breaker is closed', done => {
             const error = new Error('request failure');
 
             breakerMock.rejects(error);
@@ -169,7 +171,7 @@ describe('index test', () => {
             });
         });
 
-        it('does not retry when the breaker is closed', (done) => {
+        it('does not retry when the breaker is closed', done => {
             const error = new Error('request failure');
 
             breakerMock.rejects(error);
@@ -183,7 +185,7 @@ describe('index test', () => {
             });
         });
 
-        it('retries 3 times until success', (done) => {
+        it('retries 3 times until success', done => {
             const error = new Error('request failure');
 
             breakerMock.rejects(error);
@@ -201,15 +203,15 @@ describe('index test', () => {
             });
         });
 
-        it('will short circuit retries when special conditions met', (done) => {
+        it('will short circuit retries when special conditions met', done => {
             breaker = new Breaker('testFn', {
                 shouldRetry: (err, args) => args[0] === '1' && err.message !== 'request failure2',
                 breaker: {
-                    resetTimeout: 1000,
-                    maxFailures: 400
+                    resetTimeout: 500,
+                    maxFailures: 40
                 },
                 retry: {
-                    minTimeout: 25
+                    minTimeout: 10
                 }
             });
 
@@ -221,7 +223,7 @@ describe('index test', () => {
 
             breaker.runCommand('1', '2', (err, data) => {
                 assert.notOk(data);
-                assert.deepEqual(err, error);
+                assert.deepEqual(err, error2);
                 assert.callCount(breakerMock, 3);
                 done();
             });
@@ -230,11 +232,10 @@ describe('index test', () => {
         it('implements a promise interface when no callback', () => {
             breakerMock.resolves('foo');
 
-            return breaker.runCommand('1', '2')
-                .then((data) => {
-                    assert.calledWith(breakerMock, '1', '2');
-                    assert.equal(data, 'foo');
-                });
+            return breaker.runCommand('1', '2').then(data => {
+                assert.calledWith(breakerMock, '1', '2');
+                assert.equal(data, 'foo');
+            });
         });
 
         it('handles broken promise when no callback', () => {
@@ -242,23 +243,21 @@ describe('index test', () => {
 
             breakerMock.rejects(breakerError);
 
-            return breaker.runCommand('1', '2')
-                .catch((err) => {
-                    assert.calledWith(breakerMock, '1', '2');
-                    assert.deepEqual(err, breakerError);
-                });
+            return breaker.runCommand('1', '2').catch(err => {
+                assert.calledWith(breakerMock, '1', '2');
+                assert.deepEqual(err, breakerError);
+            });
         });
-        it('Return error when the CircuitBreaker timeout', () => {
+        it('returns error when the CircuitBreaker timeout', () => {
             const breakerError = new Error('CircuitBreaker timeout');
 
             breakerMock.rejects(breakerError);
 
-            return breaker.runCommand('1', '2')
-                .catch((err) => {
-                    assert.calledWith(breakerMock, '1', '2');
-                    assert.deepEqual(err, breakerError);
-                    assert.deepEqual(err.status, 504);
-                });
+            return breaker.runCommand('1', '2').catch(err => {
+                assert.calledWith(breakerMock, '1', '2');
+                assert.deepEqual(err, breakerError);
+                assert.deepEqual(err.status, 504);
+            });
         });
     });
 
