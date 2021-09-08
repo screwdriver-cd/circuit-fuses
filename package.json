@@ -52,7 +52,6 @@
     "sinon": "^9.0.0"
   },
   "dependencies": {
-    "request": "^2.88.0",
     "retry-function": "^2.0.0",
     "screwdriver-logger": "^1.0.2",
     "screwdriver-node-circuitbreaker": "^1.0.0"
