@@ -94,9 +94,9 @@ was tripped on ${new Date().toUTCString()}`);
 
                     if (err) {
                         logger.info(`Getting errors with ${JSON.stringify(args)}: ${err}`);
-                        if (err.status === undefined) {
+                        if (err.statusCode === undefined) {
                             if (err.message.indexOf('CircuitBreaker timeout') !== -1) {
-                                err.status = 504;
+                                err.statusCode = 504;
                             }
                         }
 
