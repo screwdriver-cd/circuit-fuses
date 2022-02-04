@@ -256,7 +256,7 @@ describe('index test', () => {
             return breaker.runCommand('1', '2').catch(err => {
                 assert.calledWith(breakerMock, '1', '2');
                 assert.deepEqual(err, breakerError);
-                assert.deepEqual(err.status, 504);
+                assert.deepEqual(err.statusCode, 504);
             });
         });
     });
