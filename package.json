@@ -1,16 +1,15 @@
 {
   "name": "circuit-fuses",
-  "version": "4.0.0",
+  "version": "5.0.0",
   "description": "Wrapper around node-circuitbreaker to define a callback interface",
   "main": "index.js",
   "scripts": {
     "pretest": "eslint .",
-    "test": "nyc --report-dir ./artifacts/coverage --reporter=lcov mocha --reporter mocha-multi-reporters --reporter-options configFile=./mocha.config.json --recursive --timeout 4000 --retries 1 --exit --allow-uncaught true --color true",
-    "semantic-release": "semantic-release pre && npm publish && semantic-release post"
+    "test": "nyc --report-dir ./artifacts/coverage --reporter=lcov mocha --reporter mocha-multi-reporters --reporter-options configFile=./mocha.config.json --recursive --timeout 4000 --retries 1 --exit --allow-uncaught true --color true"
   },
   "repository": {
     "type": "git",
-    "url": "git@github.com:screwdriver-cd/circuit-fuses.git"
+    "url": "git+https://github.com/screwdriver-cd/circuit-fuses.git"
   },
   "homepage": "https://github.com/screwdriver-cd/circuit-fuses",
   "bugs": "https://github.com/screwdriver-cd/screwdriver/issues",
@@ -35,25 +34,22 @@
     "Tiffany Kyi <tiffanykyi@gmail.com>"
   ],
   "release": {
-    "debug": false,
-    "verifyConditions": {
-      "path": "./node_modules/semantic-release/src/lib/plugin-noop.js"
-    }
+    "debug": false
   },
   "devDependencies": {
-    "chai": "^4.3.4",
-    "eslint": "^7.5.0",
-    "eslint-config-screwdriver": "^5.0.1",
-    "mocha": "^8.2.1",
+    "chai": "^4.3.7",
+    "eslint": "^8.28.0",
+    "eslint-config-screwdriver": "^7.0.0",
+    "mocha": "^10.1.0",
     "mocha-multi-reporters": "^1.5.1",
     "mocha-sonarqube-reporter": "^1.0.2",
-    "nyc": "^15.0.0",
-    "mockery": "^2.0.0",
-    "sinon": "^9.0.0"
+    "nyc": "^15.1.0",
+    "mockery": "^2.1.0",
+    "sinon": "^15.0.0"
   },
   "dependencies": {
-    "retry-function": "^2.0.0",
-    "screwdriver-logger": "^1.0.2",
-    "screwdriver-node-circuitbreaker": "^1.0.0"
+    "screwdriver-retry-function": "^0.0.2",
+    "screwdriver-logger": "^2.0.0",
+    "screwdriver-node-circuitbreaker": "^2.0.0"
   }
 }

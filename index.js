@@ -4,7 +4,7 @@
 
 const circuitbreaker = require('screwdriver-node-circuitbreaker');
 const logger = require('screwdriver-logger');
-const retryFn = require('retry-function');
+const retryFn = require('screwdriver-retry-function');
 const EventEmitter = require('events');
 
 /* Class representing a node circuit breaker.
@@ -43,7 +43,7 @@ class CircuitBreaker extends EventEmitter {
             retries: retryOptions.retries || 5,
             factor: retryOptions.factor || 2,
             minTimeout: retryOptions.minTimeout || 1000,
-            maxTimeout: retryOptions.maxTimeout || Number.MAX_VALUE,
+            maxTimeout: retryOptions.maxTimeout || Number.MAX_SAFE_INTEGER,
             randomize: retryOptions.randomize || false
         };
 
