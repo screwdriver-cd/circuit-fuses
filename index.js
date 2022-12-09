@@ -46,7 +46,6 @@ class CircuitBreaker extends EventEmitter {
             maxTimeout: retryOptions.maxTimeout || Number.MAX_SAFE_INTEGER,
             randomize: retryOptions.randomize || false
         };
-
         this.shouldRetry = (options && options.shouldRetry) || (() => true);
 
         this.breaker = circuitbreaker(this.command, this.breakerOptions);
