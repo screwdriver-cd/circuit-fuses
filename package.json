@@ -1,6 +1,6 @@
 {
   "name": "circuit-fuses",
-  "version": "5.0.0",
+  "version": "6.0.0",
   "description": "Wrapper around node-circuitbreaker to define a callback interface",
   "main": "index.js",
   "scripts": {
@@ -38,8 +38,8 @@
   },
   "devDependencies": {
     "chai": "^4.3.7",
-    "eslint": "^8.28.0",
-    "eslint-config-screwdriver": "^7.0.0",
+    "eslint": "^8.57.0",
+    "eslint-config-screwdriver": "^8.0.0",
     "mocha": "^10.1.0",
     "mocha-multi-reporters": "^1.5.1",
     "mocha-sonarqube-reporter": "^1.0.2",
@@ -48,8 +48,8 @@
     "sinon": "^15.0.0"
   },
   "dependencies": {
-    "screwdriver-retry-function": "^0.0.2",
-    "screwdriver-logger": "^2.0.0",
-    "screwdriver-node-circuitbreaker": "^2.0.0"
+    "screwdriver-retry-function": "^1.0.0",
+    "screwdriver-logger": "^3.0.0",
+    "screwdriver-node-circuitbreaker": "^3.0.0"
   }
 }
