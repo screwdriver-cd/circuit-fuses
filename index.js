@@ -92,10 +92,7 @@ was tripped on ${new Date().toUTCString()}`);
                     }
 
                     if (err) {
-                        const safeArgs = JSON.stringify(
-                            args,
-                            (key, value) => key === 'token' ? '[REDACTED]' : value
-                        );
+                        const safeArgs = JSON.stringify(args, (key, value) => (key === 'token' ? '[REDACTED]' : value));
 
                         logger.error(`Getting errors with ${safeArgs}: ${err}`);
                         if (err.statusCode === undefined) {
